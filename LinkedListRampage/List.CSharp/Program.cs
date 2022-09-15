@@ -1,187 +1,45 @@
-﻿using System;
-
-// List:
+﻿// List:
 //  - new
 //  - getAt
 //  - AddLast
 //  - PopLast
 
-namespace MyList
+namespace Tests
 {
-    class Node
+    static internal class ListTests
     {
-        public int data { get; private set; }
-        public Node? next { get; set; }
-
-        public Node(int x)
+        static void StringTest()
         {
-            this.data = x;
-        }
-    }
+            Console.WriteLine($"\nRunning: {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            var xs = new MyList.List<string>();
+            xs.AddLast("Generics");
+            xs.AddLast("Are");
+            xs.AddLast("Cool");
 
-    class List
-    {
-        public Node? first { get; private set; }
-        public Node? last { get; private set; }
-        public int Length { get; private set; } = 0;
-
-        public List(Node first)
-        {
-            this.first = first;
-            this.last = first;
-            this.Length++;
+            Console.WriteLine($"Last element: {xs.Pop()}");
+            Console.WriteLine($"Last - 1 element: {xs.Pop()}");
+            Console.WriteLine($"Real length: {xs.Length}, expected length: 1");
         }
 
-        public List()
+        static void IntTest()
         {
-            this.first = null;
-            this.last = null;
-        }
-
-        public int GetAt(int index)
-        {
-            if (index >= this.Length)
-            {
-                throw new IndexOutOfRangeException(
-                    $"Index: {index} is out if list bounds, length: {this.Length}"
-                );
-            }
-
-            if (this.Length == 0 || this.first == null || this.last == null)
-            {
-                throw new IndexOutOfRangeException("list is empty");
-            }
-
-            var tmp = this.first;
-
-            for (var i = 0; i < index; i++)
-            {
-                if (tmp != null)
-                {
-                    tmp = tmp.next;
-                }
-            }
-
-            if (tmp == null)
-            {
-                throw new Exception("Internal error: list corrupted");
-            }
-
-            return tmp.data;
-        }
-
-        public void AddFirst(int x)
-        {
-            var newNode = new Node(x);
-            if (this.Length == 0)
-            {
-                this.first = newNode;
-                this.last = newNode;
-            }
-            else
-            {
-                newNode.next = this.first;
-                this.first = newNode;
-            }
-
-            this.Length++;
-
-        }
-
-        public void AddLast(int x)
-        {
-            var newNode = new Node(x);
-            if (this.Length == 0)
-            {
-                this.first = newNode;
-                this.last = newNode;
-            }
-            else if (this.last != null)
-            {
-                this.last.next = newNode;
-                this.last = newNode;
-            }
-
-            this.Length++;
-        }
-
-        public int Pop()
-        {
-            if (this.Length == 0 || this.first == null || this.last == null)
-            {
-                throw new IndexOutOfRangeException("list is empty");
-            }
-
-            var data = this.last.data;
-
-            if (this.Length == 1)
-            {
-                this.first = null;
-                this.last = null;
-                return data;
-            }
-
-            var previous = this.first;
-            var current = this.first;
-
-            while (current.next != null)
-            {
-                previous = current;
-                current = current.next;
-            }
-
-            this.last = previous;
-            this.Length--;
-            return data;
-        }
-
-        public void RemoveLast()
-        {
-            if (this.Length == 0 || this.first == null || this.last == null)
-            {
-                throw new IndexOutOfRangeException("list is empty");
-            }
-
-            var data = this.last.data;
-
-            if (this.Length == 1)
-            {
-                this.first = null;
-                this.last = null;
-                return;
-            }
-
-            var previous = this.first;
-            var current = this.first;
-
-            while (current.next != null)
-            {
-                previous = current;
-                current = current.next;
-            }
-
-            this.last = previous;
-            this.Length--;
-        }
-    }
-
-    internal class ListTests
-    {
-        static void Main(string[] args)
-        {
-            object myObj = 12;
-            var strObj = myObj.ToString();
-            Console.WriteLine(strObj);
-            var testList = new List();
+            Console.WriteLine($"\nRunning: {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            var testList = new MyList.List<int>();
             testList.AddLast(1);
             testList.AddLast(2);
             testList.AddLast(3);
-            Console.WriteLine($"List element at 0: {testList.GetAt(2)}; length: {testList.Length}\n");
+
+            Console.WriteLine($"List element at 2: {testList.GetAt(2)}; length: {testList.Length}");
             Console.WriteLine($"List pop: {testList.Pop()}");
             Console.WriteLine($"List pop: {testList.Pop()}");
             Console.WriteLine($"Length: {testList.Length}");
         }
 
+        static void Main(string[] args)
+        {
+            StringTest();
+            IntTest();
+        }
     }
 }
 
@@ -200,3 +58,10 @@ namespace MyList
 //  -> VM - виртуальная машина - "операционная система" внутри ОС
 
 //  -> Интерполяция строк - https://docs.microsoft.com/ru-ru/dotnet/csharp/language-reference/tokens/interpolated
+
+// _____ 15.09.20 _______
+
+// -> internal <class> - доступ к классу внутри сборки = грубо говоря внутри проекта .csproj
+// -> рефлексия .NET - возможность получать доступ (и модифицировать) в run time к данным о данных выполняющегося сейчас кода (внутри сборки)
+// -> интерфейс - контракт, указывающий, какие методы (включая сигнатуру - название метода, тип аргументов и тип возвращаемого значения), класс, или структура должны реализовывать, чтобы выполнять этот крнтракт
+//  -> интерфейс в C# является типом, а соответственно типы, выполняющие его - его подтипами
