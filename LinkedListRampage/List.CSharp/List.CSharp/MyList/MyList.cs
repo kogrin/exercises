@@ -1,8 +1,14 @@
 using System.Collections;
 
-namespace MyList
+namespace List.CSharp.MyList
 {
-    class Node<T> where T : notnull
+    // List methods:
+    //  - New
+    //  - GetAt
+    //  - AddLast
+    //  - PopLast
+
+    public class Node<T> where T : notnull
     {
         public T data { get; set; }
         public Node<T>? next { get; set; }
@@ -13,7 +19,7 @@ namespace MyList
         }
     }
 
-    class List<T> : IList<T> where T : notnull
+    public class List<T> : IList<T> where T : notnull
     {
         public Node<T>? first { get; private set; }
         public Node<T>? last { get; private set; }
@@ -21,7 +27,7 @@ namespace MyList
 
         public bool IsReadOnly => false;
 
-        private void checkIndex(int index)
+        private void CheckIndex(int index)
         {
             if (index >= this.Count || index < 0)
             {
@@ -29,14 +35,14 @@ namespace MyList
             }
         }
 
-        private Node<T> getByIndex(int index)
+        private Node<T> GetByIndex(int index)
         {
             var current = this.first;
             for (var i = 0; i < index; i++)
             {
                 if (current != null) { current = current.next; }
             }
-            
+
             return current ?? throw new NullReferenceException("Internal error: list corrupted");
         }
 
@@ -61,15 +67,15 @@ namespace MyList
 
         public T GetAt(int index)
         {
-            checkIndex(index);
-            var current = getByIndex(index);
+            CheckIndex(index);
+            var current = GetByIndex(index);
             return current.data;
         }
 
         public void SetAt(int index, T item)
         {
-            checkIndex(index);
-            var current = getByIndex(index);
+            CheckIndex(index);
+            var current = GetByIndex(index);
             current.data = item;
         }
 
@@ -178,7 +184,7 @@ namespace MyList
 
         public void Insert(int index, T item)
         {
-            if (index == 0) 
+            if (index == 0)
             {
                 AddFirst(item);
                 return;
@@ -203,14 +209,14 @@ namespace MyList
             }
 
             if (previous == null) { throw new NullReferenceException("Internal error: list corrupted"); }
-            var node = new Node<T>(item); 
+            var node = new Node<T>(item);
             previous.next = node;
             node.next = current;
         }
 
         public void RemoveAt(int index)
         {
-            checkIndex(index);
+            CheckIndex(index);
 
             if (this.Count == 0 || this.first == null || this.last == null)
             {
