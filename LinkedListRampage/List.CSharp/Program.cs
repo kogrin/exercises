@@ -18,7 +18,7 @@ namespace Tests
 
             Console.WriteLine($"Last element: {xs.Pop()}");
             Console.WriteLine($"Last - 1 element: {xs.Pop()}");
-            Console.WriteLine($"Real length: {xs.Length}, expected length: 1");
+            Console.WriteLine($"Real length: {xs.Count}, expected length: 1");
         }
 
         static void IntTest()
@@ -28,11 +28,10 @@ namespace Tests
             testList.AddLast(1);
             testList.AddLast(2);
             testList.AddLast(3);
-
-            Console.WriteLine($"List element at 2: {testList.GetAt(2)}; length: {testList.Length}");
+            Console.WriteLine($"List element at 2: {testList.GetAt(2)}; length: {testList.Count}");
             Console.WriteLine($"List pop: {testList.Pop()}");
             Console.WriteLine($"List pop: {testList.Pop()}");
-            Console.WriteLine($"Length: {testList.Length}");
+            Console.WriteLine($"Length: {testList.Count}");
         }
 
         static void Main(string[] args)

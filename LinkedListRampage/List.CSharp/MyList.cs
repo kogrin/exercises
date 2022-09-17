@@ -1,8 +1,10 @@
+using System.Collections;
+
 namespace MyList
 {
-    class Node<T>
+    class Node<T> where T : notnull
     {
-        public T data { get; private set; }
+        public T data { get; set; }
         public Node<T>? next { get; set; }
 
         public Node(T x)
@@ -11,17 +13,44 @@ namespace MyList
         }
     }
 
-    class List<T>
+    class List<T> : IList<T> where T : notnull
     {
         public Node<T>? first { get; private set; }
         public Node<T>? last { get; private set; }
-        public int Length { get; private set; } = 0;
+        public int Count { get; private set; } = 0;
+
+        public bool IsReadOnly => false;
+
+        private void checkIndex(int index)
+        {
+            if (index >= this.Count || index < 0)
+            {
+                throw new ArgumentOutOfRangeException($"List length is: {this.Count}, unexpected index: {index}");
+            }
+        }
+
+        private Node<T> getByIndex(int index)
+        {
+            var current = this.first;
+            for (var i = 0; i < index; i++)
+            {
+                if (current != null) { current = current.next; }
+            }
+            
+            return current ?? throw new NullReferenceException("Internal error: list corrupted");
+        }
+
+        public T this[int index]
+        {
+            get => GetAt(index);
+            set => SetAt(index, value);
+        }
 
         public List(Node<T> first)
         {
             this.first = first;
             this.last = first;
-            this.Length++;
+            this.Count++;
         }
 
         public List()
@@ -32,40 +61,22 @@ namespace MyList
 
         public T GetAt(int index)
         {
-            if (index >= this.Length)
-            {
-                throw new IndexOutOfRangeException(
-                    $"Index: {index} is out if list bounds, length: {this.Length}"
-                );
-            }
-
-            if (this.Length == 0 || this.first == null || this.last == null)
-            {
-                throw new IndexOutOfRangeException("list is empty");
-            }
-
-            var tmp = this.first;
-
-            for (var i = 0; i < index; i++)
-            {
-                if (tmp != null)
-                {
-                    tmp = tmp.next;
-                }
-            }
-
-            if (tmp == null)
-            {
-                throw new Exception("Internal error: list corrupted");
-            }
-
-            return tmp.data;
+            checkIndex(index);
+            var current = getByIndex(index);
+            return current.data;
         }
 
-        public void AddFirst(T x)
+        public void SetAt(int index, T item)
         {
-            var newNode = new Node<T>(x);
-            if (this.Length == 0)
+            checkIndex(index);
+            var current = getByIndex(index);
+            current.data = item;
+        }
+
+        public void AddFirst(T item)
+        {
+            var newNode = new Node<T>(item);
+            if (this.Count == 0)
             {
                 this.first = newNode;
                 this.last = newNode;
@@ -76,14 +87,14 @@ namespace MyList
                 this.first = newNode;
             }
 
-            this.Length++;
+            this.Count++;
 
         }
 
-        public void AddLast(T x)
+        public void AddLast(T item)
         {
-            var newNode = new Node<T>(x);
-            if (this.Length == 0)
+            var newNode = new Node<T>(item);
+            if (this.Count == 0)
             {
                 this.first = newNode;
                 this.last = newNode;
@@ -94,19 +105,19 @@ namespace MyList
                 this.last = newNode;
             }
 
-            this.Length++;
+            this.Count++;
         }
 
         public T Pop()
         {
-            if (this.Length == 0 || this.first == null || this.last == null)
+            if (this.Count == 0 || this.first == null || this.last == null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
 
             var data = this.last.data;
 
-            if (this.Length == 1)
+            if (this.Count == 1)
             {
                 this.first = null;
                 this.last = null;
@@ -123,20 +134,20 @@ namespace MyList
             }
 
             this.last = previous;
-            this.Length--;
+            this.Count--;
             return data;
         }
 
         public void RemoveLast()
         {
-            if (this.Length == 0 || this.first == null || this.last == null)
+            if (this.Count == 0 || this.first == null || this.last == null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
 
             var data = this.last.data;
 
-            if (this.Length == 1)
+            if (this.Count == 1)
             {
                 this.first = null;
                 this.last = null;
@@ -153,7 +164,124 @@ namespace MyList
             }
 
             this.last = previous;
-            this.Length--;
+            this.Count--;
+        }
+
+        public int IndexOf(T item)
+        {
+            var current = this.first;
+            if (current == null) return -1;
+            if (item == null) throw new ArgumentNullException();
+            // TODO: поиск по значению
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, T item)
+        {
+            if (index == 0) 
+            {
+                AddFirst(item);
+                return;
+            }
+
+            if (index == this.Count)
+            {
+                AddLast(item);
+                return;
+            }
+
+            var previous = this.first;
+            var current = this.first;
+
+            for (var i = 1; i < index; i++)
+            {
+                if (current != null)
+                {
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            if (previous == null) { throw new NullReferenceException("Internal error: list corrupted"); }
+            var node = new Node<T>(item); 
+            previous.next = node;
+            node.next = current;
+        }
+
+        public void RemoveAt(int index)
+        {
+            checkIndex(index);
+
+            if (this.Count == 0 || this.first == null || this.last == null)
+            {
+                throw new IndexOutOfRangeException("list is empty");
+            }
+
+            if (index == Count - 1)
+            {
+                RemoveLast();
+                return;
+            }
+
+            if (index == 0)
+            {
+                this.first = this.first.next;
+                return;
+            }
+
+            var previous = this.first;
+            var current = this.first;
+
+            for (var i = 1; i < index; i++)
+            {
+                if (current != null)
+                {
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            if (current == null)
+            {
+                throw new NullReferenceException("Internal error: list corrupted");
+            }
+
+            previous.next = current.next;
+        }
+
+        public void Add(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 
