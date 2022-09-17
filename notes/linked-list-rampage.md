@@ -1,7 +1,7 @@
 # Implementing linked list knowing little about C\#
 
 - Compile time - во время компиляции = значит до запуска программы
-- Run time - во время работы программы - после запуска
+- Run time - во время работы программы = после запуска
 - Runtime (слитно) - среда выполнения кода =
   - Виртуальная Машина (в случае C\# -- .NET CLR / Java -- JVM ) или ОС (в случае C/C++)
     - \+ все библиотеки, которые нужны для выполнения программы
@@ -36,3 +36,9 @@ ___
       set => SetAt(index, value);
     }
     ```
+
+- Компиляция и исполнение C/C++ vs C#:
+  - C/C++ ![compiling process](./compiling-process.svg)
+    => Компилируется в машинный код (бинарники под разную архитектуру - x86 vs ARM - не заработают в другой) который исполняется ОС/ЦПУ
+  - C\# - компилируется в байт-код - IL (Intermediate Language) = CIL = MicroSoft Common Intermediate Language, **который исполняет виртуальная (магическая) машина** - CLR (Common Language Runtime) - он стандартизирован (существует "священная" [документация ECMA 335](https://www.ecma-international.org/publications-and-standards/standards/ecma-335/) в которой подробно описано как он работает) и называется Common Language Infrastructure (CIL)  
+  -> множество языков исполняются на одной "платформе" (Компилятор + CLR)
