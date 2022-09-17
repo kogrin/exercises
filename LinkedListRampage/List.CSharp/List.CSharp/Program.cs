@@ -6,7 +6,7 @@
 
 namespace Tests
 {
-    static internal class ListTests
+    internal static class ListTests
     {
         static void StringTest()
         {
