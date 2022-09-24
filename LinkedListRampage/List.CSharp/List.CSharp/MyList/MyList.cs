@@ -19,7 +19,7 @@ namespace List.CSharp.MyList
         }
     }
 
-    public class List<T> : IList<T> where T : notnull
+    public class List<T> : IList<T> where T : notnull, IEquatable<T>
     {
         public Node<T>? first { get; private set; }
         public Node<T>? last { get; private set; }
@@ -105,7 +105,7 @@ namespace List.CSharp.MyList
                 this.first = newNode;
                 this.last = newNode;
             }
-            else if (this.last != null)
+            else if (this.last is not null)
             {
                 this.last.next = newNode;
                 this.last = newNode;
@@ -116,7 +116,7 @@ namespace List.CSharp.MyList
 
         public T Pop()
         {
-            if (this.Count == 0 || this.first == null || this.last == null)
+            if (this.Count == 0 || this.first is null || this.last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
@@ -133,7 +133,7 @@ namespace List.CSharp.MyList
             var previous = this.first;
             var current = this.first;
 
-            while (current.next != null)
+            while (current.next is not null)
             {
                 previous = current;
                 current = current.next;
@@ -146,7 +146,7 @@ namespace List.CSharp.MyList
 
         public void RemoveLast()
         {
-            if (this.Count == 0 || this.first == null || this.last == null)
+            if (this.Count == 0 || this.first is null || this.last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
@@ -163,7 +163,7 @@ namespace List.CSharp.MyList
             var previous = this.first;
             var current = this.first;
 
-            while (current.next != null)
+            while (current.next is not null)
             {
                 previous = current;
                 current = current.next;
@@ -176,10 +176,17 @@ namespace List.CSharp.MyList
         public int IndexOf(T item)
         {
             var current = this.first;
-            if (current == null) return -1;
-            if (item == null) throw new ArgumentNullException();
-            // TODO: поиск по значению
-            throw new NotImplementedException();
+            if (current is null) return -1;
+            if (item is null) throw new ArgumentNullException(nameof(item));
+            
+            var index = 0;
+            while (current is not null && !current.data.Equals(item))
+            {
+                index++;
+                current = current.next;
+            }
+
+            return (index == this.Count) ? -1 : index;
         }
 
         public void Insert(int index, T item)
@@ -201,14 +208,14 @@ namespace List.CSharp.MyList
 
             for (var i = 1; i < index; i++)
             {
-                if (current != null)
+                if (current is not null)
                 {
                     previous = current;
                     current = current.next;
                 }
             }
 
-            if (previous == null) { throw new NullReferenceException("Internal error: list corrupted"); }
+            if (previous is null) { throw new NullReferenceException("Internal error: list corrupted"); }
             var node = new Node<T>(item);
             previous.next = node;
             node.next = current;
@@ -218,7 +225,7 @@ namespace List.CSharp.MyList
         {
             CheckIndex(index);
 
-            if (this.Count == 0 || this.first == null || this.last == null)
+            if (this.Count == 0 || this.first is null || this.last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
@@ -240,14 +247,14 @@ namespace List.CSharp.MyList
 
             for (var i = 1; i < index; i++)
             {
-                if (current != null)
+                if (current is not null)
                 {
                     previous = current;
                     current = current.next;
                 }
             }
 
-            if (current == null)
+            if (current is null)
             {
                 throw new NullReferenceException("Internal error: list corrupted");
             }
@@ -290,5 +297,4 @@ namespace List.CSharp.MyList
             throw new NotImplementedException();
         }
     }
-
 }
