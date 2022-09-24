@@ -40,7 +40,7 @@ namespace List.CSharp.MyList
             var current = this.first;
             for (var i = 0; i < index; i++)
             {
-                if (current != null) { current = current.next; }
+                if (current is not null) { current = current.next; }
             }
 
             return current ?? throw new NullReferenceException("Internal error: list corrupted");
