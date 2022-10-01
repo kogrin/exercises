@@ -2,27 +2,21 @@ using System.Collections;
 
 namespace List.CSharp.MyList
 {
-    // List methods:
-    //  - New
-    //  - GetAt
-    //  - AddLast
-    //  - PopLast
-
     public class Node<T> where T : notnull
     {
-        public T data { get; set; }
-        public Node<T>? next { get; set; }
+        public T Data { get; set; }
+        public Node<T>? Next { get; set; }
 
         public Node(T x)
         {
-            this.data = x;
+            this.Data = x;
         }
     }
 
     public class List<T> : IList<T> where T : notnull, IEquatable<T>
     {
-        public Node<T>? first { get; private set; }
-        public Node<T>? last { get; private set; }
+        public Node<T>? First { get; private set; }
+        public Node<T>? Last { get; private set; }
         public int Count { get; private set; } = 0;
 
         public bool IsReadOnly => false;
@@ -37,10 +31,10 @@ namespace List.CSharp.MyList
 
         private Node<T> GetByIndex(int index)
         {
-            var current = this.first;
+            var current = this.First;
             for (var i = 0; i < index; i++)
             {
-                if (current is not null) { current = current.next; }
+                current = current?.Next;
             }
 
             return current ?? throw new NullReferenceException("Internal error: list corrupted");
@@ -54,29 +48,29 @@ namespace List.CSharp.MyList
 
         public List(Node<T> first)
         {
-            this.first = first;
-            this.last = first;
+            this.First = first;
+            this.Last = first;
             this.Count++;
         }
 
         public List()
         {
-            this.first = null;
-            this.last = null;
+            this.First = null;
+            this.Last = null;
         }
 
         public T GetAt(int index)
         {
             CheckIndex(index);
             var current = GetByIndex(index);
-            return current.data;
+            return current.Data;
         }
 
         public void SetAt(int index, T item)
         {
             CheckIndex(index);
             var current = GetByIndex(index);
-            current.data = item;
+            current.Data = item;
         }
 
         public void AddFirst(T item)
@@ -84,17 +78,16 @@ namespace List.CSharp.MyList
             var newNode = new Node<T>(item);
             if (this.Count == 0)
             {
-                this.first = newNode;
-                this.last = newNode;
+                this.First = newNode;
+                this.Last = newNode;
             }
             else
             {
-                newNode.next = this.first;
-                this.first = newNode;
+                newNode.Next = this.First;
+                this.First = newNode;
             }
 
             this.Count++;
-
         }
 
         public void AddLast(T item)
@@ -102,13 +95,13 @@ namespace List.CSharp.MyList
             var newNode = new Node<T>(item);
             if (this.Count == 0)
             {
-                this.first = newNode;
-                this.last = newNode;
+                this.First = newNode;
+                this.Last = newNode;
             }
-            else if (this.last is not null)
+            else if (this.Last is not null)
             {
-                this.last.next = newNode;
-                this.last = newNode;
+                this.Last.Next = newNode;
+                this.Last = newNode;
             }
 
             this.Count++;
@@ -116,74 +109,74 @@ namespace List.CSharp.MyList
 
         public T Pop()
         {
-            if (this.Count == 0 || this.first is null || this.last is null)
+            if (this.Count == 0 || this.First is null || this.Last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
 
-            var data = this.last.data;
+            var data = this.Last.Data;
 
             if (this.Count == 1)
             {
-                this.first = null;
-                this.last = null;
+                this.First = null;
+                this.Last = null;
                 return data;
             }
 
-            var previous = this.first;
-            var current = this.first;
+            var previous = this.First;
+            var current = this.First;
 
-            while (current.next is not null)
+            while (current.Next is not null)
             {
                 previous = current;
-                current = current.next;
+                current = current.Next;
             }
 
-            this.last = previous;
+            this.Last = previous;
             this.Count--;
             return data;
         }
 
         public void RemoveLast()
         {
-            if (this.Count == 0 || this.first is null || this.last is null)
+            if (this.Count == 0 || this.First is null || this.Last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
 
-            var data = this.last.data;
+            var data = this.Last.Data;
 
             if (this.Count == 1)
             {
-                this.first = null;
-                this.last = null;
+                this.First = null;
+                this.Last = null;
                 return;
             }
 
-            var previous = this.first;
-            var current = this.first;
+            var previous = this.First;
+            var current = this.First;
 
-            while (current.next is not null)
+            while (current.Next is not null)
             {
                 previous = current;
-                current = current.next;
+                current = current.Next;
             }
 
-            this.last = previous;
+            this.Last = previous;
             this.Count--;
         }
 
         public int IndexOf(T item)
         {
-            var current = this.first;
+            var current = this.First;
             if (current is null) return -1;
             if (item is null) throw new ArgumentNullException(nameof(item));
-            
+
             var index = 0;
-            while (current is not null && !current.data.Equals(item))
+            while (current is not null && !current.Data.Equals(item))
             {
                 index++;
-                current = current.next;
+                current = current.Next;
             }
 
             return (index == this.Count) ? -1 : index;
@@ -203,29 +196,33 @@ namespace List.CSharp.MyList
                 return;
             }
 
-            var previous = this.first;
-            var current = this.first;
+            var previous = this.First;
+            var current = this.First;
 
             for (var i = 1; i < index; i++)
             {
                 if (current is not null)
                 {
                     previous = current;
-                    current = current.next;
+                    current = current.Next;
                 }
             }
 
-            if (previous is null) { throw new NullReferenceException("Internal error: list corrupted"); }
+            if (previous is null)
+            {
+                throw new NullReferenceException("Internal error: list corrupted");
+            }
+
             var node = new Node<T>(item);
-            previous.next = node;
-            node.next = current;
+            previous.Next = node;
+            node.Next = current;
         }
 
         public void RemoveAt(int index)
         {
             CheckIndex(index);
 
-            if (this.Count == 0 || this.first is null || this.last is null)
+            if (this.Count == 0 || this.First is null || this.Last is null)
             {
                 throw new IndexOutOfRangeException("list is empty");
             }
@@ -238,19 +235,19 @@ namespace List.CSharp.MyList
 
             if (index == 0)
             {
-                this.first = this.first.next;
+                this.First = this.First.Next;
                 return;
             }
 
-            var previous = this.first;
-            var current = this.first;
+            var previous = this.First;
+            var current = this.First;
 
             for (var i = 1; i < index; i++)
             {
                 if (current is not null)
                 {
                     previous = current;
-                    current = current.next;
+                    current = current.Next;
                 }
             }
 
@@ -259,32 +256,69 @@ namespace List.CSharp.MyList
                 throw new NullReferenceException("Internal error: list corrupted");
             }
 
-            previous.next = current.next;
+            previous.Next = current.Next;
         }
 
-        public void Add(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public void Add(T item) => AddLast(item);
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            this.First = null;
+            this.Last = null;
+            this.Count = 0;
         }
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+            var current = this.First;
+            if (current is null) return false;
+            if (item is null) throw new ArgumentNullException(nameof(item));
+
+            var index = 0;
+            while (current is not null && !current.Data.Equals(item))
+            {
+                index++;
+                current = current.Next;
+            }
+
+            return index != this.Count;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (array is null) throw new ArgumentNullException(nameof(array));
+            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            if (array.Length < this.Count + arrayIndex)
+                throw new ArgumentException("Array's size is less than list", nameof(array));
+
+            var k = arrayIndex;
+            var current = this.First;
+            for (var i = 0; i < this.Count; i++)
+            {
+                if (current == null) throw new NullReferenceException("List is corrupted");
+                array[k] = current.Data;
+                current = current.Next;
+                k += 1;
+            }
         }
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            var current = this.First;
+            if (current is null) return false;
+            if (item is null) throw new ArgumentNullException(nameof(item));
+
+            var index = 0;
+            while (current is not null && !current.Data.Equals(item))
+            {
+                index++;
+                current = current.Next;
+            }
+
+            if (index == this.Count) return false;
+            if (index == this.Count - 1) this.RemoveLast();
+            else this.RemoveAt(index);
+            return true;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -295,6 +329,28 @@ namespace List.CSharp.MyList
         IEnumerator IEnumerable.GetEnumerator()
         {
             throw new NotImplementedException();
+        }
+
+        public struct ListEnumerator : IEnumerator<T>, IEnumerator
+        {
+            public bool MoveNext()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Reset()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Current { get; }
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
