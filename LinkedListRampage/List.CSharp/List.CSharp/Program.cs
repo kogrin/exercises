@@ -28,9 +28,24 @@ internal static class MainTests
         Console.WriteLine($"Length: {testList.Count}");
     }
 
+    static void ForeachTest()
+    {
+        Console.WriteLine($"\nRunning: {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+        var testList = new MyList.List<int>();
+        testList.AddLast(1);
+        testList.AddLast(2);
+        testList.AddLast(3);
+        foreach (var x in testList)
+        {
+            Console.WriteLine(x);
+        }
+        Console.WriteLine("");
+    } 
+
     static void Main(string[] args)
     {
         StringTest();
         IntTest();
+        ForeachTest();
     }
 }

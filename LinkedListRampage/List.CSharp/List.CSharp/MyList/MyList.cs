@@ -13,7 +13,8 @@ namespace List.CSharp.MyList
         }
     }
 
-    public class List<T> : IList<T> where T : notnull, IEquatable<T>
+    // TODO: Beautification
+    public class List<T> : IList<T> where T : IEquatable<T>
     {
         public Node<T>? First { get; private set; }
         public Node<T>? Last { get; private set; }
@@ -201,11 +202,9 @@ namespace List.CSharp.MyList
 
             for (var i = 1; i < index; i++)
             {
-                if (current is not null)
-                {
-                    previous = current;
-                    current = current.Next;
-                }
+                if (current is null) continue;
+                previous = current;
+                current = current.Next;
             }
 
             if (previous is null)
@@ -244,11 +243,9 @@ namespace List.CSharp.MyList
 
             for (var i = 1; i < index; i++)
             {
-                if (current is not null)
-                {
-                    previous = current;
-                    current = current.Next;
-                }
+                if (current is null) continue;
+                previous = current;
+                current = current.Next;
             }
 
             if (current is null)
@@ -323,32 +320,55 @@ namespace List.CSharp.MyList
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return new ListEnumerator(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return (IEnumerator) this.GetEnumerator();
         }
 
-        public struct ListEnumerator : IEnumerator<T>, IEnumerator
+        public class ListEnumerator : IEnumerator<T>, IEnumerator
         {
+            private readonly List<T> _list;
+            private int _position = -1;
+
+            public ListEnumerator(List<T> listCollection)
+            {
+                this._list = listCollection;
+            }
+
             public bool MoveNext()
             {
-                throw new NotImplementedException();
+                this._position++;
+                return this._position < this._list.Count;
             }
 
             public void Reset()
             {
-                throw new NotImplementedException();
+                this._position = -1;
             }
 
-            public T Current { get; }
+            public T Current
+            {
+                get
+                {
+                    try
+                    {
+                        return this._list[_position];
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+            }
 
-            object IEnumerator.Current => Current;
+            object IEnumerator.Current => this.Current;
 
             public void Dispose()
             {
+                // Learn about IDisposable
                 throw new NotImplementedException();
             }
         }
